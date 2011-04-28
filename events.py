@@ -2,14 +2,17 @@
 
 assoc = {}
 
-def register(fct, event):
+def register(eventgroup, event, fct):
 	global assoc
-	if not assoc.has_key(event):
-		assoc[event] = []
-	assoc[event].append(fct)
+	if not assoc.has_key(eventgroup):
+		assoc[eventgroup] = {}
+	if not assoc[eventgroup].has_key(event):
+		assoc[eventgroup][event] = []
+	assoc[eventgroup][event].append(fct)
 
-def fire(event, time, value):
+def fire(eventgroup, event, value):
 	global assoc
-	if assoc.has_key(event):
-		for fct in assoc[event]:
-			fct(time, value)
+	if assoc.has_key(eventgroup):
+		if assoc[eventgroup].has_key(event):
+			for fct in assoc[eventgroup][event]:
+				fct(value)

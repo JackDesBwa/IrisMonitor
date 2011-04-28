@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 class IrisChannel:
-	def read(self):
-		return None
+	def run(self):
+		return
 
 import os, sys
 
