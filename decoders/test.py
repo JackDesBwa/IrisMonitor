@@ -1,5 +1,8 @@
 #!/usr/bin/env python
-import sys, channels, decoders, events
+
+import sys, os
+sys.path.append(os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
+import channels, decoders, events
 
 def onAllMessages(event, data):
 	sys.stdout.write('%f : ' % data[0])

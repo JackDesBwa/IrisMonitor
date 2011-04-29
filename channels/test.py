@@ -1,7 +1,11 @@
-import sys, channels, events
+#!/usr/bin/env python
+
+import sys, os
+sys.path.append(os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
+import channels, events
 
 onReceive_col = 0
-def onReceive(byte):
+def onReceive(event, byte):
 	global onReceive_col
 	if not byte : return
 	onReceive_col += 1
@@ -30,10 +34,14 @@ try:
 	sys.stdout.write('Test of `%s`\n' % chanlist[a])
 	theclass = channels.get_class(chanlist[a])
 	chan = theclass()
-	chan.run()
 except ValueError:
 	sys.stdout.write('Invalid number.\n')
 except IndexError:
 	sys.stdout.write('Unknowed entry.\n')
+except KeyboardInterrupt:
+	sys.exit('Interrupted test.\n')
+
+try:
+	chan.run()
 except KeyboardInterrupt:
 	sys.stdout.write('End of test.\n')
