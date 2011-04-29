@@ -16,8 +16,7 @@ def get_class(plugin):
 	if not pluginpath in sys.path:
 		sys.path.append(pluginpath)
 	if plugin in plugin_list:
-		imported = __import__(plugin, globals(), locals(), (plugin))
-		return imported.__dict__[plugin]
+		plugin_list[plugin]
 
 plugin_list = {}
 pluginpath = os.path.abspath(os.path.dirname(__file__))
@@ -27,6 +26,7 @@ if pluginpath:
 		if os.path.isdir(directory):
 			if os.path.exists(os.path.join(directory, '__init__.py')):
 				imported = __import__(plugin, globals(), locals(), (plugin))
-				theclass = imported.__dict__[plugin]
-				if issubclass(theclass, IrisViewer):
-					plugin_list[plugin] = theclass
+				if plugin in imported.__dict__:
+					theclass = imported.__dict__[plugin]
+					if issubclass(theclass, IrisViewer):
+						plugin_list[plugin] = theclass
