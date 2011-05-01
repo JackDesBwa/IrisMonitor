@@ -4,6 +4,7 @@ import sys, os
 sys.path.remove(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import channels, config, events
+from io import open
 
 onReceive_col = 0
 def onReceive(event, byte):
@@ -44,9 +45,18 @@ except KeyboardInterrupt:
 sys.stdout.write('Test of `%s`\n' % chanlist[a])
 chan = theclass()
 
-sys.stdout.write('\nYou should probably change the configuration.\nType `c` to modify a parameter or anything else if you accept the value :')
+config_list = chan.get_config_list()
+
+sys.stdout.write('\nYou should probably change the configuration.\nType `l` if you want to load a file.\n')
+if sys.stdin.readline() == 'l\n':
+	sys.stdout.write('    OK, type the name of the file: ');
+	configfile = open(sys.stdin.readline().strip())
+	config_list.load(configfile.read())
+	configfile.close()
+else:
+	sys.stdout.write('    No file to load.'); 
+sys.stdout.write('Type `c` to modify a parameter or anything else if you accept the value :')
 try:
-	config_list = chan.get_config_list()
 	for c in config_list:
 		validated = False;
 		while not validated:
@@ -54,13 +64,20 @@ try:
 			if sys.stdin.readline() == 'c\n':
 				sys.stdout.write('    You want to change the value of `%s`. Type the new value.\n    ' % c)
 				sys.stdout.write('The value should be %s.\n    ' % config_list.configs[c].condition())
-						
 				setattr(config_list, c, sys.stdin.readline().strip())
 			else:
 				validated = True
 except KeyboardInterrupt:
 	sys.exit('Interrupted test.\n')
 sys.stdout.write('OK. All parameters are set.\n')
+sys.stdout.write('\nIf you want to save the configuration, type `s`.\n')
+if sys.stdin.readline() == 's\n':
+	sys.stdout.write('    OK, type the name of the file: ');
+	configfile = open(sys.stdin.readline().strip(), 'w')
+	configfile.write(unicode(config_list.save()))
+	configfile.close()
+else:
+	sys.stdout.write('    No file to load.'); 
 
 try:
 	chan.run()
