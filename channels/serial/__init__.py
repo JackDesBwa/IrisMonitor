@@ -8,6 +8,7 @@ try:
 
 	class serial(IrisChannel):
 		def __init__(self):
+			IrisChannel.__init__(self)
 			self.config = config.ConfigList(self.__class__, {
 				'port' : config.ConfigString('Port name', '0'),
 				'baudrate' : config.ConfigChoice('Baudrate', serial_module.Serial.BAUDRATES, 9600),

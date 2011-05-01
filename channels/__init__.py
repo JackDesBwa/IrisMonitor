@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 
+import config
+
 class IrisChannel:
+	def __init__(self):
+		self.config = config.ConfigList(self.__class__, ());
+	
 	def get_config_list(self):
 		return self.config
 
