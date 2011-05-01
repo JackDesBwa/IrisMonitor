@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import sys, os
-sys.path.append(os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
-import channels, events
+sys.path.remove(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import channels, config, events
 
 onReceive_col = 0
 def onReceive(event, byte):
@@ -28,18 +29,38 @@ for c in chanlist:
 	sys.stdout.write('  %3d    %s\n' % (i, c))
 	i += 1
 
+sys.stdout.write('Which one would be tested ? ')
+
 try:
-	sys.stdout.write('Which one would be tested ? ')
 	a = int(sys.stdin.readline())
-	sys.stdout.write('Test of `%s`\n' % chanlist[a])
 	theclass = channels.get_class(chanlist[a])
-	chan = theclass()
 except ValueError:
-	sys.stdout.write('Invalid number.\n')
+	sys.exit('Invalid number.\n')
 except IndexError:
-	sys.stdout.write('Unknowed entry.\n')
+	sys.exit('Unknowed entry.\n')
 except KeyboardInterrupt:
 	sys.exit('Interrupted test.\n')
+
+sys.stdout.write('Test of `%s`\n' % chanlist[a])
+chan = theclass()
+
+sys.stdout.write('\nYou should probably change the configuration.\nType `c` to modify a parameter or anything else if you accept the value :')
+try:
+	config_list = chan.get_config_list()
+	for c in config_list:
+		validated = False;
+		while not validated:
+			sys.stdout.write('\n`%s` is set to `%s`        ' % (c, getattr(config_list, c)))
+			if sys.stdin.readline() == 'c\n':
+				sys.stdout.write('    You want to change the value of `%s`. Type the new value.\n    ' % c)
+				sys.stdout.write('The value should be %s.\n    ' % config_list.configs[c].condition())
+						
+				setattr(config_list, c, sys.stdin.readline().strip())
+			else:
+				validated = True
+except KeyboardInterrupt:
+	sys.exit('Interrupted test.\n')
+sys.stdout.write('OK. All parameters are set.\n')
 
 try:
 	chan.run()

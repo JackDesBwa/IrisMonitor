@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
 class IrisChannel:
+	def get_config_list(self):
+		return self.config
+
 	def run(self):
-		return
+		pass
 
 import os, sys
 
