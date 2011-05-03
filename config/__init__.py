@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import json
+import json, gui
 
 class ConfigList:
 	def __init__(self, name, configs):
@@ -32,7 +32,6 @@ class ConfigList:
 		if build_struct[0] != self.name: return
 		for key in build_struct[1]:
 			setattr(self, key, build_struct[1][key])
-		print(build_struct)
 		
 	def save(self):
 		build_struct = {}
@@ -51,6 +50,9 @@ class ConfigBase:
 	def condition(self):
 		pass
 
+	def gui_config(self):
+		return gui.GuiConfig('Error')
+
 class ConfigString(ConfigBase):
 	def __init__(self, desc, default = ''):
 		self.desc = str(desc)
@@ -61,6 +63,9 @@ class ConfigString(ConfigBase):
 
 	def set(self, value):
 		self.value = str(value)
+
+	def gui_config(self):
+		return gui.GuiConfig(self.desc, text = self.value)
 
 class ConfigChoice(ConfigBase):
 	def __init__(self, desc, choices, default = None):
@@ -89,6 +94,9 @@ class ConfigChoice(ConfigBase):
 		if str(value) in self.available:
 			self.value = self.available[str(value)]
 
+	def gui_config(self):
+		return gui.GuiConfig(self.desc, text = self.get(True), choices = self.available)
+
 class ConfigInt(ConfigBase):
 	def __init__(self, desc, mini=None, maxi=None, default=None):
 		self.mini = int(mini) if mini != None else None
@@ -112,25 +120,19 @@ class ConfigInt(ConfigBase):
 		if (not self.mini or int(value) >= self.mini) and (not self. maxi or int(value) <= self.maxi):
 			self.value = int(value)
 
-class ConfigFloat(ConfigBase):
-	def __init__(self, desc, mini=None, maxi=None, default=None):
-		self.mini = float(mini) if mini != None else None
-		self.maxi = float(maxi) if maxi != None else None
-		self.desc = desc
-		self.value = self.mini if self.mini else self.maxi if self.maxi else 0
-		if default != None:
-			self.set(default)
-			
+	def gui_config(self):
+		return gui.GuiConfig(self.desc, integer = self.value, mini = self.mini, maxi = self.maxi)
+
+class ConfigBool(ConfigBase):
+	def __init__(self, desc, default = False):
+		self.value = False
+		self.set(default)
+
 	def condition(self):
-		if self.mini != None and self.maxi != None:
-			return 'between %d and %d' % (self.mini, self.maxi)
-		elif self.maxi != None:
-			return 'less than %d' % (self.maxi)
-		elif self.mini != None:
-			return 'more than %d' % (self.mini)
-		else:
-			return 'an number'
+		return 'a boolean'
 
 	def set(self, value):
-		if (not self.mini or value >= self.mini) and (not self. maxi or value <= self.maxi):
-			self.value = float(value)
+		self.value = True if value else False
+
+	def gui_config(self):
+		return gui.GuiConfig(self.desc, boolean = self.value)
