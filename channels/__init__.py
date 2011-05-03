@@ -1,15 +1,49 @@
 #!/usr/bin/env python
 
 import config
+from threading import Thread
 
 class IrisChannel:
 	def __init__(self):
+		self.stop_running = True
 		self.config = config.ConfigList(self.__class__, ());
 	
 	def get_config_list(self):
 		return self.config
 
-	def run(self):
+	def start(self, wait = False):
+		self.thread = Thread(target=self.thread_run)
+		self.thread.start()
+		if wait:
+			self.thread.join()
+	
+	def thread_run(self):
+		self.stop_running = False
+		self.loop_init()
+		while not self.stop_running:
+			self.loop()
+		self.loop_finish()
+			
+	def thread_stop(self, cb = None):
+		if not self.stop_running:
+			self.stop_running = True
+			self.thread.join(5)
+			if self.thread.is_alive():
+				self.thread._Thread__stop()
+		if cb:
+			cb()
+
+	def stop(self, cb = None):
+		Thread(target=self.thread_stop, args=(cb,)).start()
+			
+
+	def loop_init(self):
+		pass
+
+	def loop(self):
+		pass
+
+	def loop_finish(self):
 		pass
 
 import os, sys

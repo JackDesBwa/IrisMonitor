@@ -5,11 +5,11 @@ import sys, events
 from channels import IrisChannel
 
 class stdin(IrisChannel):
+	"""Using standard input"""
 	def __init__(self):
 		IrisChannel.__init__(self)
 
-	def run(self):
-		while 1:
-			byte = sys.stdin.read(1)
-			if not byte: byte = '\x00'
-			events.fire(IrisChannel, 'onReceive', byte)
+	def loop(self):
+		byte = sys.stdin.read(1)
+		if not byte: byte = '\x00'
+		events.fire(IrisChannel, 'onReceive', byte)

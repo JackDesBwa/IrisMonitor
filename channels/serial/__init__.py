@@ -7,6 +7,7 @@ try:
 	import serial as serial_module
 
 	class serial(IrisChannel):
+		"""Using serial port (COM/RS232/TTY)"""
 		def __init__(self):
 			IrisChannel.__init__(self)
 			self.config = config.ConfigList(self.__class__, {
@@ -18,15 +19,19 @@ try:
 				'control' : config.ConfigChoice('Flow control method', ('None', 'RTS/CTS', 'Xon/Xoff'), 'None')
 			})
 
-		def run(self):
+		def loop_init(self):
 			xonxoff = rtscts = False
 			if self.config.control == 'RTS/CTS':
 				rtscts = True
 			elif self.config.control == 'Xon/Xoff':
 				xonxoff = True
-			serial = serial_module.Serial(self.config.port, baudrate=self.config.baudrate, bytesize=self.config.bytesize, parity=self.config.parity, stopbits=self.config.stopbits, timeout=None, xonxoff=xonxoff, rtscts=rtscts)
-			while 1:
-				events.fire(IrisChannel, 'onReceive', serial.read(1))
+			self.serial = serial_module.Serial(self.config.port, baudrate=self.config.baudrate, bytesize=self.config.bytesize, parity=self.config.parity, stopbits=self.config.stopbits, timeout=None, xonxoff=xonxoff, rtscts=rtscts)
+
+		def loop(self):
+			events.fire(IrisChannel, 'onReceive', self.serial.read(1))
+
+		def loop_finish(self):
+			self.serial.close()
 except:
 	sys.stderr.write('`pyserial` is needed for using the serial channel.')
 	pass

@@ -82,6 +82,6 @@ else:
 	sys.stdout.write('    No file to load.'); 
 
 try:
-	chan.run()
+	chan.start(True)
 except KeyboardInterrupt:
 	sys.stdout.write('End of test.\n')
