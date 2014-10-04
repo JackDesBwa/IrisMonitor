@@ -1,3 +1,15 @@
+WARNING:
+This projet is abandoned for a while and does not work.
+Please see RRUI <https://github.com/JackDesBwa/RRUI> project for better (working) version in QtQuick.
+
+
+
+
+
+
+
+
+
 IrisMonitor
 ===========
 
